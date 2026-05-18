@@ -80,6 +80,10 @@ router.post('/recommend', async (req, res) => {
     `;
 
     const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+    
+    console.log('API Key exists:', !!openRouterApiKey);
+    console.log('API Key length:', openRouterApiKey?.length || 0);
+    
     if (!openRouterApiKey) {
       return res.status(500).json({ message: 'OpenRouter API key not configured' });
     }
@@ -87,10 +91,9 @@ router.post('/recommend', async (req, res) => {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'anthropic/claude-sonnet-latest',
+        model: 'poolside/laguna-xs.2:free',
         temperature: 0.7,
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        messages: [{ role: 'user', content: prompt }]
       },
       {
         headers: {
@@ -115,8 +118,15 @@ router.post('/recommend', async (req, res) => {
     }
 
   } catch (error) {
-    console.error('AI Route Error:', error.response?.data || error.message);
-    res.status(500).json({ message: 'Error communicating with AI service' });
+    console.error('AI Route Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    res.status(500).json({ 
+      message: 'Error communicating with AI service',
+      error: error.response?.data?.error?.message || error.message
+    });
   }
 });
 
@@ -155,10 +165,9 @@ router.post('/bulk-rank', async (req, res) => {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'anthropic/claude-sonnet-latest',
+        model: 'poolside/laguna-xs.2:free',
         temperature: 0.5,
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        messages: [{ role: 'user', content: prompt }]
       },
       {
         headers: { 'Authorization': `Bearer ${openRouterApiKey}`, 'Content-Type': 'application/json' }
