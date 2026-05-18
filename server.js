@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// Load environment variables
 dotenv.config();
 
 const authRoutes = require('./routes/authRoutes');
@@ -13,8 +12,24 @@ const aiRoutes = require('./routes/aiRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174"
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
+
+// Health check routes
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
+
+app.get("/api", (req, res) => {
+  res.json({ message: "API is working" });
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
