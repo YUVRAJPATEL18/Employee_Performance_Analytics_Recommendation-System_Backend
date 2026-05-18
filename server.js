@@ -13,10 +13,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174"
-  ],
+  origin: function(origin, callback) {
+    // Allow localhost and any origin during development
+    callback(null, true);
+  },
   credentials: true
 }));
 
